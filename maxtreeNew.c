@@ -71,7 +71,38 @@ struct Node *insertNode(struct Node *root, int newkey) {
     return root;
 }
 
+struct Node *min(struct Node *node) {
+    struct Node *current = node;
+
+    while(current && current->left != NULL) {
+        current = current->left;
+    }
+    return current;
+}
+// This function deletes the node pointed to by the key and frees it @TODO currently does not work, make it work
 struct Node *deleteNode(struct Node *root, int key) {
+    if(root == NULL) {
+        return root;
+    }
+    if(key < root->key) {
+        root->left = deleteNode(root->left, key);
+    } else if(key > root->key) {
+        root->right = deleteNode(root->right, key);
+    } else if(key == root->key) {
+        if(root->left == NULL) {
+            struct Node *temp = root->right;
+            free(root);
+            return temp;
+        } else if(root->right == NULL) {
+            struct Node *temp = root->left;
+            free(root);
+            return temp;
+        }
+        struct Node *temp = min(root->right);
+        root->key = temp->key;
+        root->right = deleteNode(root->right, temp->key);
+
+    }
     return root;
 }
 
