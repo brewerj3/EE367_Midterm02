@@ -79,7 +79,7 @@ struct Node *min(struct Node *node) {
     }
     return current;
 }
-// This function deletes the node pointed to by the key and frees it @TODO currently does not work, make it work
+// This function deletes the node pointed to by the key and frees it
 struct Node *deleteNode(struct Node *root, int key) {
     if(root == NULL) {
         return root;
