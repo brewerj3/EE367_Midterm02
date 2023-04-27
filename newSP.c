@@ -1,6 +1,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#define INFINITE 10000
+
 struct listNode {
     int nodeID;
     struct listNode *next;
@@ -17,7 +19,7 @@ void destroyGraph(int numNodes, struct listNode **adj);
 int numSP(int numNodes, struct listNode **adj, int s, int t);
 
 int main() {
-    int numNodes;  // Numbere of nodes in the graph
+    int numNodes;  // Number of nodes in the graph
     int s;         // Source node
     int t;         // Destination node
     struct listNode **adj; // Adjacency list of a graph
@@ -38,9 +40,23 @@ int main() {
 
     return 0;
 }
+void initializeArray(int array[], int numNodes, int setTo) {
+    for(int i = 0; i < numNodes; i++) {
+        array[i] = setTo;
+    }
+}
 
-// This does not work yet
+// Return number of shortest paths in from node s to node t
 int numSP(int numNodes, struct listNode **adj, int s, int t) {
+    //array to hold dist nodes or not
+    int dist[numNodes];
+    initializeArray(dist, numNodes, INFINITE);
+    int count[numNodes];
+    initializeArray(count, numNodes, 0);
+    dist[s] = 0;
+    count[s] = 1;
+
+
     return 0;
 }
 
