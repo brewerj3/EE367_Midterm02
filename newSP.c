@@ -2,10 +2,17 @@
 #include <stdio.h>
 
 #define INFINITE 10000
+#define VISITED 1
+#define UNVISITED 0
 
 struct listNode {
     int nodeID;
     struct listNode *next;
+};
+
+struct Queue {
+    int front, rear, size, capacity;
+    int *array;
 };
 
 struct listNode **createGraph1(int *numNodes, int *s, int *t);
@@ -17,6 +24,15 @@ void displayGraph(int numNodes, struct listNode **adj, int s, int t);
 void destroyGraph(int numNodes, struct listNode **adj);
 
 int numSP(int numNodes, struct listNode **adj, int s, int t);
+
+struct Queue *createQueue(int capacity) {
+    struct Queue *queue = (struct Queue *) malloc(sizeof(struct Queue));
+    queue->capacity = capacity;
+    queue->front = queue->size = 0;
+    queue->rear = capacity - 1;
+    queue->array = (int *) malloc(queue->capacity * sizeof(int));
+    return queue;
+}
 
 int main() {
     int numNodes;  // Number of nodes in the graph
@@ -40,24 +56,76 @@ int main() {
 
     return 0;
 }
+
 void initializeArray(int array[], int numNodes, int setTo) {
-    for(int i = 0; i < numNodes; i++) {
+    for (int i = 0; i < numNodes; i++) {
         array[i] = setTo;
     }
 }
+
+int isFull(struct Queue *queue) {
+    return (queue->size == queue->capacity);
+}
+
+int isEmpty(struct Queue *queue) {
+    return (queue->size == 0);
+}
+
+void enqueue(struct Queue *queue, int item) {
+    if (isFull(queue)) {
+        printf("full queue\n");
+        return;
+    }
+    queue->rear = (queue->rear + 1) % queue->capacity;
+    queue->array[queue->rear] = item;
+    queue->size = queue->size + 1;
+}
+
+int dequeue(struct Queue *queue) {
+    if (isEmpty(queue)) {
+        return -1;
+    }
+    int item = queue->array[queue->front];
+    queue->front = (queue->front + 1) % queue->capacity;
+    queue->size = queue->size - 1;
+    return item;
+}
+
 
 // Return number of shortest paths in from node s to node t
 int numSP(int numNodes, struct listNode **adj, int s, int t) {
     //array to hold dist nodes or not
     int dist[numNodes];
-    initializeArray(dist, numNodes, INFINITE);
     int count[numNodes];
+    int visited[numNodes];
+    initializeArray(dist, numNodes, INFINITE);
     initializeArray(count, numNodes, 0);
+    initializeArray(visited, numNodes, UNVISITED);
     dist[s] = 0;
     count[s] = 1;
+    struct Queue *que = createQueue(numNodes * numNodes);
+    enqueue(que, adj[s]->nodeID);
+    while (!isEmpty(que)) {
+        int u = dequeue(que);
+        for (struct listNode *p = adj[u]->next; p != NULL; p = p->next) {
+            int v = p->nodeID;
+            if(visited[v] == UNVISITED) {
+                visited[v] = VISITED;
+                int newDistance = dist[u] + 1;
+                if(dist[v] <= newDistance) {
+                    dist[v] = newDistance;
+                    count[v] = count[u];
+                } else if(dist[v] > newDistance) {
+                    dist[v] = newDistance;
+                    count[v] = count[u];
+                    enqueue(que, v);
+                }
+            }
+        }
 
 
-    return 0;
+    }
+    return count[t];
 }
 
 void addAdjList(struct listNode **adj, int u, int v) {
