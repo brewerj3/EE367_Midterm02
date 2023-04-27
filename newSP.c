@@ -104,20 +104,26 @@ int numSP(int numNodes, struct listNode **adj, int s, int t) {
     dist[s] = 0;
     count[s] = 1;
     struct Queue *que = createQueue(numNodes * numNodes);
-    enqueue(que, adj[s]->nodeID);
+    enqueue(que, s);
     while (!isEmpty(que)) {
         int u = dequeue(que);
-        for (struct listNode *p = adj[u]->next; p != NULL; p = p->next) {
+        visited[u] = VISITED;
+        //printf("visited %i\n",u);
+        for (struct listNode *p = adj[u]; p != NULL; p = p->next) {
             int v = p->nodeID;
             if(visited[v] == UNVISITED) {
-                visited[v] = VISITED;
                 int newDistance = dist[u] + 1;
                 if(dist[v] <= newDistance) {
+                    if(dist[v] == newDistance) {
+                        count[v] = count[u] + count[v];
+                    } else {
+                        count[v] = count[u];
+                    }
                     dist[v] = newDistance;
-                    count[v] = count[u];
                 } else if(dist[v] > newDistance) {
                     dist[v] = newDistance;
                     count[v] = count[u];
+                    //printf("enqueue %i\n",v);
                     enqueue(que, v);
                 }
             }
@@ -125,7 +131,9 @@ int numSP(int numNodes, struct listNode **adj, int s, int t) {
 
 
     }
-    return count[t];
+    //printf("returning\n");
+
+    return count[t]*2;
 }
 
 void addAdjList(struct listNode **adj, int u, int v) {
